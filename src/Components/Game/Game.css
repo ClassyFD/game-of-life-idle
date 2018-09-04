@@ -4,11 +4,17 @@
   align-items: center;
   width: 100%;
   padding: 30px;
+  min-height: 100vh;
 }
 .game-score-section {
   display: flex;
-  justify-content: space-evenly;
+  justify-content: flex-start;
+  margin-top: 50px;
+  margin-bottom: 50px;
   width: 100%;
+}
+.game-score-section h1 {
+  margin-left: 50px;
 }
 .game-main-section {
   height: 159.5px;
@@ -27,9 +33,6 @@
   background-color: #e4e4e4;
   border: 1px solid black;
   color: rgb(87, 87, 209);
-}
-.game-score-heading {
-  margin: 50px auto;
 }
 .game-upgrades-section {
   display: flex;
@@ -52,6 +55,8 @@
   text-align: center;
   border: 1px solid black;
   margin: 5px;
+  user-select: none;
+  cursor: pointer;
 }
 .game-upgrades h1 {
   font-size: 18px;
@@ -65,4 +70,4 @@
 }
 .game-upgrades p {
   font-size: 14px;
-}
+} 
