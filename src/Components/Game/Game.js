@@ -11,8 +11,8 @@ class Game extends Component {
       gameObj: [],
       power: 1,
       numAlive: 0,
-      lifePoints: 5000000,
-      deathPoints: 5000000,
+      lifePoints: 1000,
+      deathPoints: 0,
       lifeBonus: 1.0,
       deathBonus: 0.1,
       lifeMultiplier: 0.1,
@@ -29,14 +29,14 @@ class Game extends Component {
           baseAmount: 1,
           levels: 10,
           currentLevel: 0,
-          costMultiplier: 10.00,
+          costMultiplier: 5.00,
           amountMultiplier: 1.00,
         },
         {
           name: 'Increase life multiplier',
           baseCost: {
             lifePoints: 0,
-            deathPoints: 5,
+            deathPoints: 2,
           },
           baseAmount:.1,
           levels: 100,
@@ -59,26 +59,36 @@ class Game extends Component {
         {
           name: 'Increase death bonus',
           baseCost: {
-            lifePoints: 50,
+            lifePoints: 20,
             deathPoints: 0,
           },
           baseAmount:.1,
           levels: 100,
           currentLevel: 0,
-          costMultiplier: 1.15,
+          costMultiplier: 1.11,
           amountMultiplier: 1.15,
         },
         {
           name: 'Increase life bonus',
           baseCost: {
             lifePoints: 0,
-            deathPoints: 50,
+            deathPoints: 15,
           },
           baseAmount:.1,
           levels: 100,
           currentLevel: 0,
-          costMultiplier: 1.15,
+          costMultiplier: 1.11,
           amountMultiplier: 1.50,
+        },
+        {
+          name: 'Buy "Next" button',
+          baseCost: {
+            lifePoints: 1000,
+            deathPoints: 0,
+          },
+          baseAmount:.1,
+          levels: 1,
+          currentLevel: 0,
         },
       ]
     }
@@ -171,6 +181,7 @@ class Game extends Component {
     if (this.state.lifePoints >= lifePointCost && this.state.deathPoints >= deathPointCost && currentLevel < levels) {
       this.state.upgrades.forEach((el)=>{
         if (el.name === type) {
+          el.status = 'locked';
           el.currentLevel += 1;
           this.setState({
             lifePoints: lifePointSubtracted,
@@ -244,9 +255,29 @@ class Game extends Component {
 
   render() {
     let { state } = this,
+        upgrades,
+        nextButton; 
+    nextButton = this.state.upgrades.map((el)=>{
+      if (el.name === 'Buy "Next" button') {
+        if (el.currentLevel === el.levels) {
+          return (
+            <div onClick={()=>{this.iterate()}} className={`game-button`}>Next</div>
+          )
+        } else {
+          return null
+        }
+      }
+    })
     upgrades = this.state.upgrades.map((el, i)=>{
       let lifePointCost = Number((el.baseCost.lifePoints * Math.pow(el.costMultiplier, el.currentLevel)).toFixed(2)),
           deathPointCost = Number((el.baseCost.deathPoints * Math.pow(el.costMultiplier, el.currentLevel)).toFixed(2));
+        if (
+          (lifePointCost > 0 && deathPointCost > 0 && state.lifePoints >= lifePointCost / 3 && state.deathPoints >= deathPointCost / 3) ||
+          (lifePointCost > 0 && deathPointCost === 0 && state.lifePoints >= (lifePointCost / 3)) ||
+          (deathPointCost > 0 && lifePointCost === 0 && state.deathPoints >= (deathPointCost / 3)) ||
+          (el.status==='unlocked')
+        ) {
+        el.status = 'unlocked';
         return (
           <aside key={i} onClick={()=>{this.buyUpgrade(el.name, el.currentLevel, el.levels, el.baseCost, el.costMultiplier, el.baseAmount, el.amountMultiplier)}} className={`game-upgrades`}>
             <h1>
@@ -276,8 +307,10 @@ class Game extends Component {
             </div>
           </aside>
         )
+      } else {
+        return null;
       }
-    )
+    })
   
     return (
       <main className={'Game'}>
@@ -298,6 +331,9 @@ class Game extends Component {
               <div onClick={()=>{this.activateSquare(el.x, el.y)}} key={el.key} className={`game-square_${el.x}-${el.y} game-square`}/>
             )
           })}
+        </section>
+        <section className={`game-buttons-section`}>
+          {nextButton}
         </section>
         <section className={`game-upgrades-section`}>
           {upgrades}
